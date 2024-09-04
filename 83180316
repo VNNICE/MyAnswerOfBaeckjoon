@@ -1,0 +1,83 @@
+//https://www.acmicpc.net/problem/1085
+//長方形w * hの座標 (x, y)から境界線までもっとも近い距離を求める問題
+//一般的な解き方ではなく座標事距離を保存する仕組みにしてみた。
+using System;
+using System.Linq;
+
+class Program
+{
+    static int[,] CreateSquare(int w, int h)
+    {
+        int minX = 1, minY = 1;
+        int maxX = w, maxY = h;
+
+        int[,] matrix = new int[w + 1, h + 1];
+        int[] nowCoordinate = { 1, 1 }; //　境界線の距離は0であるため(1,1)からスタート
+        int[,] vector2 = {
+            { 0, 1 }, {1, 0 },
+            { 0 , -1}, {-1, 0 }
+        }; // 進む方向（右・下・左・上）
+        int direction = 0; //進む方向を決める
+        int stack = 0; //一周したことを記録するため
+        int distance = 1; //距離
+
+        for (int i = 0; i < (w - 1) * (h - 1); i++)
+        {
+            matrix[nowCoordinate[0], nowCoordinate[1]] = distance;
+            int nextX = nowCoordinate[0] + vector2[direction, 0]; //現在方向のx値を足す
+            int nextY = nowCoordinate[1] + vector2[direction, 1]; //現在方向のｙ値を足す
+            //枠を超えるか、すでに埋まったマスに出会うと回転させる
+            if (nextX < minX || nextY < minY || nextX >= maxX || nextY >= maxY || matrix[nextX, nextY] == distance)
+            {
+                //Console.WriteLine("Turn!"); 
+                if (direction == 3)
+                {
+                    direction = 0;
+                }
+                else
+                {
+                    direction++;
+                    //Console.WriteLine("Direction UP!");
+                }
+                stack++;
+                //一周したら範囲が縮まり、スタックが初期化される
+                if (stack == 4)
+                {
+                    //Console.WriteLine("Stack Up!");
+                    minX++;
+                    minY++;
+                    maxX--;
+                    maxY--;
+                    stack = 0;
+                    distance++;
+                }
+            }
+            //次に参照する座標に移す
+            nowCoordinate[0] = nowCoordinate[0] + vector2[direction, 0];
+            nowCoordinate[1] = nowCoordinate[1] + vector2[direction, 1];
+        }
+        return matrix;
+    }
+
+    private static void ShowAllElements(int w, int h, int[,] matrix)
+    {
+        for (int i = 0; i < w + 1; i++)
+        {
+            for (int j = 0; j < h + 1; j++)
+            {
+                Console.Write(matrix[i, j]);
+            }
+            Console.WriteLine();
+        }
+    }
+
+    static void Main()
+    {
+        int[] input = Console.ReadLine().Split(' ').Select(x => int.Parse(x)).ToArray();
+        int x = input[0], y = input[1], w = input[2], h = input[3];
+
+        int[,] arr = CreateSquare(w, h);
+        Console.WriteLine(arr[x, y]);
+        //ShowAllElements(w, h, arr);
+    }
+}
