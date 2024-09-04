@@ -1,0 +1,25 @@
+//https://www.acmicpc.net/problem/1157
+//与えられた単語の中でもっとも多く使用されたアルファベットを求める問題（ただし、文字の大小は区別しない、もっとも多い文字が複数ある場合は「?」を出力せよ）
+///時間制限も2秒と余裕があったのでLinqを活用して簡潔にしてみた
+
+using System;
+using System.Linq;
+class Program
+{
+    static void Main()
+    {
+        string input = Console.ReadLine().ToUpper();//すべて大文字にして処理する
+        var charGroup = input.GroupBy(x => x).Select(g => new { _char = g.Key, _count = g.Count() });//入力された文字列を自分自身でグループ化にし、文字：個数に分ける
+        var most = charGroup.Where(x => x._count == charGroup.Max(g => g._count)).Select(x => x._char).ToArray();//Countがもっとも多い文字をすべて配列に保存する
+                                                                                                                 //
+        if (most.Length > 1) //配列の範囲が1を超えるともっとも多い文字が複数存在しているという意味になる
+        {
+            Console.WriteLine("?");
+        }
+        else
+        {
+            Console.WriteLine(most[0]);
+        }
+
+    }
+}
